@@ -9,6 +9,9 @@ RUN apt-get update && apt-get install -y \
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
+# Copy pre-downloaded solc
+COPY solcx /root/.solcx
+
 COPY . .
 COPY nginx.conf /etc/nginx/nginx.conf
 COPY start.sh /start.sh
