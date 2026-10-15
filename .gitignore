@@ -1,0 +1,50 @@
+# ─── Environment ───
+.env
+*.env
+!.env.example
+
+# ─── Python ───
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+ENV/
+.venv
+build/
+dist/
+*.egg-info/
+
+# ─── Solidity ───
+*.pyc
+cache/
+artifacts/
+
+# ─── Logs ───
+*.log
+logs/
+ai-agent/logs/
+
+# ─── Data ───
+data/
+ai-agent/data/
+evidence/*.jsonl
+
+# ─── IDE ───
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# ─── OS ───
+.DS_Store
+Thumbs.db
+
+# ─── Node ───
+node_modules/
+
+# ─── Docker ───
+.dockerignore
+docker-compose.override.yml

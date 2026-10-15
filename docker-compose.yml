@@ -1,0 +1,72 @@
+services:
+  # ─── Ganache: Local Blockchain ───
+  ganache:
+    image: trufflesuite/ganache:latest
+    container_name: sentinel-ganache
+    ports:
+      - "7545:7545"
+    command: >
+      --port 7545 --host 0.0.0.0 --chain.chainId 1337
+      --wallet.deterministic --wallet.totalAccounts 10
+      --wallet.defaultBalance 1000 --miner.blockTime 1
+    networks:
+      - sentinel-net
+
+  # ─── Ollama: Local LLM ───
+  ollama:
+    image: ollama/ollama:latest
+    container_name: sentinel-ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    networks:
+      - sentinel-net
+
+  # ─── Ollama Model Puller (one-time) ───
+  ollama-pull:
+    image: ollama/ollama:latest
+    container_name: sentinel-ollama-pull
+    depends_on:
+      - ollama
+    volumes:
+      - ollama_data:/root/.ollama
+    entrypoint: >
+      sh -c "
+      echo '⏳ Waiting for Ollama to start...' &&
+      sleep 30 &&
+      echo '📥 Pulling llama3.2:3b model...' &&
+      ollama pull llama3.2:3b &&
+      echo '✅ Model ready'
+      "
+    networks:
+      - sentinel-net
+
+  # ─── API + Frontend ───
+  app:
+    build: .
+    container_name: sentinel-app
+    ports:
+      - "8000:8000"
+      - "8080:80"
+    depends_on:
+      - ganache
+      - ollama
+    environment:
+      GANACHE_URL: http://ganache:7545
+      OLLAMA_URL: http://ollama:11434
+      OLLAMA_MODEL: llama3.2:3b
+    env_file:
+      - .env
+    volumes:
+      - ./logs:/app/ai-agent/logs
+      - ./data:/app/ai-agent/data
+    networks:
+      - sentinel-net
+
+networks:
+  sentinel-net:
+    driver: bridge
+
+volumes:
+  ollama_data:
